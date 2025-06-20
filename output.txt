@@ -1,0 +1,7 @@
+Starting character-level transformer script...
+PyTorch seed set
+Configuration initialized: vocab_size=100 embed_dim=128 num_heads=4 num_layers=4 max_seq_len=128 dropout=0.1
+Model created with 819044 parameters
+Input tensor shape: torch.Size([8, 32])
+Output logits shape: torch.Size([8, 32, 100])
+Script completed successfully!
