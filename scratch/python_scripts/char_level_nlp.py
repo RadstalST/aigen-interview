@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from pydantic import BaseModel
+from tabulate import tabulate
 
 
 # ---- Config ----
@@ -86,21 +87,38 @@ class CharTransformer(nn.Module):
 # ---- Usage Example ----
 
 if __name__ == "__main__":
-    print("Starting character-level transformer script...")
+    import logging
+
+    def init_logger():
+        """Initialize logger with a specific format."""
+        logger = logging.getLogger(__name__)
+        logger.handlers.clear()  # Ensure only one handler
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+        return logger
+
+    logger = init_logger()
+    logger.info("Starting character-level transformer script...")
     torch.manual_seed(42)
-    print("PyTorch seed set")
+    logger.info("PyTorch seed set")
 
     cfg = Config(
         vocab_size=100, embed_dim=128, num_heads=4, num_layers=4, max_seq_len=128, dropout=0.1
     )
-    print(f"Configuration initialized: {cfg}")
 
+    logger.info(
+        "Configuration initialized:\n"
+        + tabulate(cfg.model_dump().items(), headers=["Parameter", "Value"], tablefmt="grid")
+    )
     model = CharTransformer(cfg)
-    print(f"Model created with {sum(p.numel() for p in model.parameters())} parameters")
+    logger.info(f"Model created with {sum(p.numel() for p in model.parameters())} parameters")
 
     x = torch.randint(0, cfg.vocab_size, (8, 32))  # batch of 8 sequences, 32 tokens each
-    print(f"Input tensor shape: {x.shape}")
+    logger.info(f"Input tensor shape: {x.shape}")
 
     logits = model(x)
-    print(f"Output logits shape: {logits.shape}")  # (8, 32, vocab_size)
-    print("Script completed successfully!")
+    logger.info(f"Output logits shape: {logits.shape}")  # (8, 32, vocab_size)
+    logger.info("Script completed successfully!")
